@@ -9,7 +9,7 @@ class MovieDbDatasource extends MoviesDatasource {
   final dio = Dio(BaseOptions(
       baseUrl: Environment.theMovieDbUrl,
       queryParameters: {
-        'api-key': Environment.theMovieDbKey,
+        'api_key': Environment.theMovieDbKey,
         'lenguage': 'es-ES'
       }));
 
