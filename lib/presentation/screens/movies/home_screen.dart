@@ -28,27 +28,47 @@ class _HomeViewState extends ConsumerState<_HomeView> {
   void initState() {
     super.initState();
     ref.read(nowPlayingMoviesProvider.notifier).loadNextPage();
+    ref.read(popularMoviesProvider.notifier).loadNextPage();
   }
 
   @override
   Widget build(BuildContext context) {
-    final nowPlayingMoviesSlider = ref.watch(moviesSlideshowProvider);
+    final sliderMovies = ref.watch(moviesSlideshowProvider);
     final nowPlayingMovies = ref.watch(nowPlayingMoviesProvider);
+    final popularMovies = ref.watch(popularMoviesProvider);
 
     if (nowPlayingMovies.isEmpty) return const CircularProgressIndicator();
 
-    return Column(
-      children: [
-        const CustomAppbar(),
-        MoviesSlideshow(movies: nowPlayingMoviesSlider),
-        MovieHorizontalListview(
-          movies: nowPlayingMovies,
-          title: 'En cines',
-          subtitle: 'Lunes 25',
-          loadNextPage: () =>
-              ref.read(nowPlayingMoviesProvider.notifier).loadNextPage(),
+    return CustomScrollView(slivers: [
+      const SliverAppBar(
+        leadingWidth: double.infinity,
+        floating: true,
+        flexibleSpace: FlexibleSpaceBar(
+          titlePadding: EdgeInsets.zero,
+          title: CustomAppbar(),
         ),
-      ],
-    );
+      ),
+      SliverList(
+          delegate: SliverChildBuilderDelegate((context, index) {
+        return Column(
+          children: [
+            MoviesSlideshow(movies: sliderMovies),
+            MovieHorizontalListview(
+              movies: nowPlayingMovies,
+              title: 'En cines',
+              subtitle: 'Lunes 25',
+              loadNextPage: () =>
+                  ref.read(nowPlayingMoviesProvider.notifier).loadNextPage(),
+            ),
+            MovieHorizontalListview(
+              movies: popularMovies,
+              title: 'Populares',
+              loadNextPage: () =>
+                  ref.read(popularMoviesProvider.notifier).loadNextPage(),
+            ),
+          ],
+        );
+      }, childCount: 1))
+    ]);
   }
 }
